@@ -1,11 +1,94 @@
-// Configuration
+// Configuration with clean URLs
 const config = {
     contentPath: 'content',
-    fallbackContent: {
-        index: '# Welcome to My Study Space\n\nThis is my digital laboratory for learning, thinking, and creating.\n\n## Current Focus\n\n- Mathematics\n- Physics\n- Computer Science\n- Competitive Programming',
-        about: '# About Me\n\nStudent passionate about mathematics, physics, and programming.\n\n## Interests\n\n- Quantum Mechanics\n- Algorithms\n- Mathematical Modeling'
+    pageMap: {
+        '': 'index',
+        'index': 'index',
+        'study': 'study',
+        'showcase': 'showcase',
+        'journal': 'journal',
+        'about': 'about',
+        'connect': 'connect'
     }
 };
+
+// Get current page from URL
+function getCurrentPage() {
+    const path = window.location.pathname.split('/').pop().replace('.html', '') || 'index';
+    return config.pageMap[path] || 'index';
+}
+
+// Update navigation to use clean URLs
+function navigateTo(page) {
+    history.pushState({page}, '', '/' + (page === 'index' ? '' : page));
+    loadPageContent(page);
+}
+
+// Modified loadPage function
+async function loadPageContent(pageName) {
+    try {
+        document.getElementById('main-content').innerHTML = '<div class="loading">Loading...</div>';
+        
+        // Map clean URL names to actual files
+        const fileName = pageName === 'index' ? 'index' : pageName;
+        const response = await fetch(`${fileName}.html`);
+        const html = await response.text();
+        
+        // Extract main content from the fetched HTML
+        const temp = document.createElement('div');
+        temp.innerHTML = html;
+        const mainContent = temp.querySelector('.main-content');
+        
+        if (mainContent) {
+            document.getElementById('main-content').innerHTML = mainContent.innerHTML;
+        } else {
+            document.getElementById('main-content').innerHTML = html;
+        }
+        
+        // Update navigation highlighting
+        updateActiveNav();
+        
+    } catch (error) {
+        console.error('Error loading page:', error);
+        document.getElementById('main-content').innerHTML = '<div class="error">Page not found</div>';
+    }
+}
+
+function updateActiveNav() {
+    // Remove active class from all links
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
+    
+    // Add active class to current page
+    const currentPage = getCurrentPage();
+    const activeLink = document.querySelector(`a[href="${currentPage === 'index' ? '/' : currentPage}.html"]`) || 
+                      document.querySelector(`a[href="/${currentPage}"]`);
+    if (activeLink) {
+        activeLink.classList.add('active');
+    }
+}
+
+// Handle back/forward buttons
+window.addEventListener('popstate', function(event) {
+    const page = getCurrentPage();
+    loadPageContent(page);
+});
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', function() {
+    const page = getCurrentPage();
+    loadPageContent(page);
+    
+    // Make navigation links use clean URLs
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const href = this.getAttribute('href').replace('.html', '');
+            navigateTo(href);
+        });
+    });
+});
 
 // Main content loader
 async function loadPage(pageName) {
