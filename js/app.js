@@ -4,7 +4,7 @@ const config = {
     journalPath: 'journal'
 };
 
-// Page content mapping - store HTML content in memory
+// Page content mapping
 const pageContent = {
     'index': null,
     'study': null,
@@ -143,15 +143,72 @@ document.addEventListener('DOMContentLoaded', async function() {
     });
 });
 
-// JOURNAL-SPECIFIC FUNCTIONS
-async function loadJournalList() {
+// AUTO-DETECT JOURNAL FILES FUNCTION
+async function getAllJournalFiles() {
     try {
-        const journalFiles = [
+        // Fetch a directory listing (this requires server support)
+        // Alternative: We'll try common patterns
+        const possibleFiles = [];
+        
+        // Generate recent dates for the past 30 days
+        for (let i = 0; i < 30; i++) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            const dateString = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+            possibleFiles.push(`${dateString}-journal.md`);
+        }
+        
+        // Also add some common historical dates
+        const historicalDates = [
+            '2025-12-31-journal.md',
+            '2025-12-30-journal.md',
+            '2025-12-29-journal.md'
+        ];
+        
+        const allPossibleFiles = [...possibleFiles, ...historicalDates];
+        const validFiles = [];
+        
+        // Check which files actually exist
+        for (const file of allPossibleFiles) {
+            try {
+                const response = await fetch(`${config.journalPath}/${file}`);
+                if (response.ok) {
+                    validFiles.push(file);
+                }
+            } catch (error) {
+                // File doesn't exist, continue
+            }
+        }
+        
+        return validFiles.sort().reverse(); // Sort by date, newest first
+        
+    } catch (error) {
+        console.error('Error detecting journal files:', error);
+        
+        // Fallback to manual list if auto-detection fails
+        return [
             '2026-01-11-journal.md',
             '2026-01-10-journal.md',
             '2026-01-09-journal.md',
             '2026-01-08-journal.md'
         ];
+    }
+}
+
+// Load journal list with auto-detection
+async function loadJournalList() {
+    try {
+        const journalFiles = await getAllJournalFiles();
+        
+        if (journalFiles.length === 0) {
+            document.getElementById('journal-list').innerHTML = `
+                <div class="empty-state">
+                    <p>No journal entries found. Create your first entry!</p>
+                    <p>Format: YYYY-MM-DD-journal.md</p>
+                </div>
+            `;
+            return;
+        }
         
         let journalHTML = '';
         
@@ -164,18 +221,31 @@ async function loadJournalList() {
                 const { frontmatter, body } = parseFrontmatter(content);
                 
                 // Create date object for sorting
-                const dateObj = new Date(frontmatter.date);
-                const dateStr = dateObj.toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                });
+                let dateStr = 'Invalid Date';
+                let title = 'Untitled Entry';
+                
+                if (frontmatter && frontmatter.date) {
+                    try {
+                        const dateObj = new Date(frontmatter.date);
+                        dateStr = dateObj.toLocaleDateString('en-US', { 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                        });
+                    } catch (e) {
+                        dateStr = 'Invalid Date';
+                    }
+                }
+                
+                if (frontmatter && frontmatter.title) {
+                    title = frontmatter.title;
+                }
                 
                 journalHTML += `
                     <div class="journal-entry" onclick="loadJournalEntry('${file}')">
-                        <h3>${dateStr} — ${frontmatter.title}</h3>
+                        <h3>${dateStr} — ${title}</h3>
                         <div class="entry-meta">
-                            ${frontmatter.tags ? frontmatter.tags.map(tag => `<span>${tag}</span>`).join('') : ''}
+                            ${frontmatter && frontmatter.tags ? frontmatter.tags.map(tag => `<span>${tag}</span>`).join('') : ''}
                         </div>
                         <p>${extractFirstParagraph(body)}</p>
                         <a href="#" class="read-more" onclick="loadJournalEntry('${file}'); event.preventDefault();">Read full entry →</a>
@@ -183,6 +253,12 @@ async function loadJournalList() {
                 `;
             } catch (error) {
                 console.error(`Error loading journal file ${file}:`, error);
+                journalHTML += `
+                    <div class="journal-entry">
+                        <h3>Error Loading Entry</h3>
+                        <p>There was an error loading this journal entry.</p>
+                    </div>
+                `;
             }
         }
         
@@ -258,16 +334,32 @@ async function loadJournalEntry(filename) {
         document.querySelector('.journal-feed').style.display = 'none';
         document.getElementById('journal-detail').style.display = 'block';
         
-        document.getElementById('journal-content').innerHTML = `
-            <article class="markdown-content">
-                <h1>${frontmatter.title}</h1>
-                <p class="journal-date">${new Date(frontmatter.date).toLocaleDateString('en-US', { 
+        let dateStr = 'Invalid Date';
+        let title = 'Untitled Entry';
+        
+        if (frontmatter && frontmatter.date) {
+            try {
+                const dateObj = new Date(frontmatter.date);
+                dateStr = dateObj.toLocaleDateString('en-US', { 
                     year: 'numeric', 
                     month: 'long', 
                     day: 'numeric' 
-                })}</p>
+                });
+            } catch (e) {
+                dateStr = 'Invalid Date';
+            }
+        }
+        
+        if (frontmatter && frontmatter.title) {
+            title = frontmatter.title;
+        }
+        
+        document.getElementById('journal-content').innerHTML = `
+            <article class="markdown-content">
+                <h1>${title}</h1>
+                <p class="journal-date">${dateStr}</p>
                 <div class="journal-tags">
-                    ${frontmatter.tags ? frontmatter.tags.map(tag => `<span class="tag">${tag}</span>`).join(' ') : ''}
+                    ${frontmatter && frontmatter.tags ? frontmatter.tags.map(tag => `<span class="tag">${tag}</span>`).join(' ') : ''}
                 </div>
                 ${htmlContent}
             </article>

@@ -24,14 +24,15 @@
                 <div class="nav-brand">
                     <a href="index.html" class="logo-link">byiqram</a>
                 </div>
-<ul class="nav-menu">
-    <li><a href="#" class="nav-link" data-page="index">welcome</a></li>
-    <li><a href="#" class="nav-link" data-page="study">study space</a></li>
-    <li><a href="#" class="nav-link" data-page="showcase">showcase</a></li>
-    <li><a href="#" class="nav-link" data-page="journal">journal</a></li>
-    <li><a href="#" class="nav-link" data-page="about">me</a></li>
-    <li><a href="#" class="nav-link" data-page="connect">connect</a></li>
-</ul>            </nav>
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="nav-link">welcome</a></li>
+                    <li><a href="study.html" class="nav-link">study space</a></li>
+                    <li><a href="showcase.html" class="nav-link">showcase</a></li>
+                    <li><a href="journal.html" class="nav-link active">journal</a></li>
+                    <li><a href="about.html" class="nav-link">me</a></li>
+                    <li><a href="connect.html" class="nav-link">connect</a></li>
+                </ul>
+            </nav>
         </header>
 
         <main class="main-content">
@@ -62,14 +63,5 @@
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
     <script src="js/app.js"></script>
-    
-    <script>
-        // Load journal list when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            if (window.location.pathname.includes('journal.html')) {
-                loadJournalList();
-            }
-        });
-    </script>
 </body>
 </html>
