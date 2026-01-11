@@ -4,27 +4,80 @@ const config = {
     journalPath: 'journal'
 };
 
-// Page content mapping
+// Page content mapping - store HTML content in memory
 const pageContent = {
-    'index': () => {
-        window.location.href = 'index.html';
-    },
-    'study': () => {
-        window.location.href = 'study.html';
-    },
-    'showcase': () => {
-        window.location.href = 'showcase.html';
-    },
-    'journal': () => {
-        window.location.href = 'journal.html';
-    },
-    'about': () => {
-        window.location.href = 'about.html';
-    },
-    'connect': () => {
-        window.location.href = 'connect.html';
-    }
+    'index': null,
+    'study': null,
+    'showcase': null,
+    'journal': null,
+    'about': null,
+    'connect': null
 };
+
+// Preload all page content
+async function preloadPages() {
+    const pages = ['index', 'study', 'showcase', 'journal', 'about', 'connect'];
+    
+    for (const page of pages) {
+        try {
+            const response = await fetch(`${page}.html`);
+            const html = await response.text();
+            pageContent[page] = html;
+        } catch (error) {
+            console.error(`Error preloading ${page}.html:`, error);
+        }
+    }
+}
+
+// Load specific page content
+async function loadPageContent(pageName) {
+    try {
+        // Show loading state
+        document.querySelector('.main-content').innerHTML = '<div class="loading">Loading...</div>';
+        
+        // Get cached content or fetch if not loaded
+        let htmlContent = pageContent[pageName];
+        if (!htmlContent) {
+            const response = await fetch(`${pageName}.html`);
+            htmlContent = await response.text();
+            pageContent[pageName] = htmlContent;
+        }
+        
+        // Extract main content from the HTML
+        const temp = document.createElement('div');
+        temp.innerHTML = htmlContent;
+        const mainContent = temp.querySelector('.main-content');
+        
+        if (mainContent) {
+            document.querySelector('.main-content').innerHTML = mainContent.innerHTML;
+        } else {
+            document.querySelector('.main-content').innerHTML = htmlContent;
+        }
+        
+        // Update navigation highlighting
+        updateActiveNav();
+        
+        // Initialize page-specific functionality
+        if (pageName === 'journal') {
+            loadJournalList();
+        }
+        
+        // Render math and highlight code
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false},
+                {left: "\\(", right: "\\)", display: false},
+                {left: "\\[", right: "\\]", display: true}
+            ]
+        });
+        hljs.highlightAll();
+        
+    } catch (error) {
+        console.error('Error loading page:', error);
+        document.querySelector('.main-content').innerHTML = '<div class="error">Page not found</div>';
+    }
+}
 
 // Get current page from URL
 function getCurrentPage() {
@@ -45,14 +98,7 @@ function getCurrentPage() {
 function navigateTo(page) {
     // Update URL without .html
     history.pushState({page}, '', '/' + (page === 'index' ? '' : page));
-    
-    // Update active navigation
-    updateActiveNav();
-    
-    // Redirect to actual HTML file
-    if (pageContent[page]) {
-        pageContent[page]();
-    }
+    loadPageContent(page);
 }
 
 // Update active navigation state
@@ -73,15 +119,21 @@ function updateActiveNav() {
 // Handle back/forward buttons
 window.addEventListener('popstate', function(event) {
     const page = getCurrentPage();
+    loadPageContent(page);
     updateActiveNav();
 });
 
 // Initialize navigation on page load
-document.addEventListener('DOMContentLoaded', function() {
-    // Update navigation based on current URL
+document.addEventListener('DOMContentLoaded', async function() {
+    // Preload all pages
+    await preloadPages();
+    
+    // Load current page
+    const currentPage = getCurrentPage();
+    loadPageContent(currentPage);
     updateActiveNav();
     
-    // Make navigation links use clean URLs
+    // Make navigation links use client-side navigation
     document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
@@ -89,27 +141,9 @@ document.addEventListener('DOMContentLoaded', function() {
             navigateTo(page);
         });
     });
-    
-    // Initialize journal page if on journal page
-    if (getCurrentPage() === 'journal') {
-        loadJournalList();
-    }
-    
-    // Render math in static content
-    renderMathInElement(document.body, {
-        delimiters: [
-            {left: "$$", right: "$$", display: true},
-            {left: "$", right: "$", display: false},
-            {left: "\\(", right: "\\)", display: false},
-            {left: "\\[", right: "\\]", display: true}
-        ]
-    });
-    
-    // Highlight code blocks
-    hljs.highlightAll();
 });
 
-// JOURNAL-SPECIFIC FUNCTIONS (only on journal page)
+// JOURNAL-SPECIFIC FUNCTIONS
 async function loadJournalList() {
     try {
         const journalFiles = [
