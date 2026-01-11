@@ -535,3 +535,67 @@ body {
         font-size: 1.5rem;
     }
 }
+
+/* Journal-specific styles */
+.journal-date {
+    color: var(--text-muted);
+    font-style: italic;
+    margin: 0.5rem 0 1rem 0;
+}
+
+.journal-tags {
+    margin: 1rem 0;
+}
+
+.journal-tags .tag {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    background: var(--secondary-accent);
+    color: var(--text-primary);
+    border-radius: 4px;
+    font-size: 0.8rem;
+    margin-right: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.back-button {
+    background: none;
+    border: 1px solid var(--divider);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    color: var(--text-primary);
+    cursor: pointer;
+    margin-bottom: 1rem;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.back-button:hover {
+    background: var(--accent);
+    color: white;
+}
+
+.journal-detail {
+    padding: 2rem 0;
+}
+
+/* Frontmatter styling */
+.frontmatter {
+    background: #f8fafc;
+    border-left: 3px solid var(--accent);
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 0 4px 4px 0;
+}
+
+.frontmatter h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.frontmatter p {
+    margin: 0.25rem 0;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}

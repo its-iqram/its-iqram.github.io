@@ -38,47 +38,16 @@
         <main class="main-content">
             <section class="journal-feed">
                 <h2 class="section-title">Learning Journal</h2>
-                <div class="journal-list">
-                    <div class="journal-entry">
-                        <h3>Jan 11, 2026 — Physics Challenge</h3>
-                        <div class="entry-meta">
-                            <span>Math • Physics • Reflection</span>
-                        </div>
-                        <p>Solved 3 problems from Griffiths. Struggled with air resistance modeling — need to revisit differential equations.</p>
-                        <a href="journal/2026-01-11-journal.md" class="read-more">Read full entry →</a>
-                    </div>
-                    <div class="journal-entry">
-                        <h3>Jan 10, 2026 — Learning Progress</h3>
-                        <div class="entry-meta">
-                            <span>Learning • Coding • Life</span>
-                        </div>
-                        <p>Completed 5 Project Euler problems. Learned about prime factorization and modular arithmetic.</p>
-                        <a href="journal/2026-01-10-learning.md" class="read-more">Read full entry →</a>
-                    </div>
-                    <div class="journal-entry">
-                        <h3>Jan 9, 2026 — Reflection Day</h3>
-                        <div class="entry-meta">
-                            <span>Life • Reflection • Goals</span>
-                        </div>
-                        <p>Reviewed my progress this month. Set new goals for next week focusing on quantum mechanics.</p>
-                        <a href="journal/2026-01-09-reflection.md" class="read-more">Read full entry →</a>
-                    </div>
-                    <div class="journal-entry">
-                        <h3>Jan 8, 2026 — Math Breakthrough</h3>
-                        <div class="entry-meta">
-                            <span>Math • Problem Solving • Success</span>
-                        </div>
-                        <p>Finally understood the proof of the Fundamental Theorem of Calculus. Feeling confident.</p>
-                        <a href="journal/2026-01-08-breakthrough.md" class="read-more">Read full entry →</a>
-                    </div>
-                    <div class="journal-entry">
-                        <h3>Jan 7, 2026 — Contest Preparation</h3>
-                        <div class="entry-meta">
-                            <span>Programming • Contest • Practice</span>
-                        </div>
-                        <p>Practiced dynamic programming problems. Prepared for upcoming Codeforces round.</p>
-                        <a href="journal/2026-01-07-contest.md" class="read-more">Read full entry →</a>
-                    </div>
+                <div id="journal-list" class="journal-list">
+                    <!-- Journal entries will be loaded here -->
+                    <div class="loading">Loading journal entries...</div>
+                </div>
+            </section>
+            
+            <section id="journal-detail" class="journal-detail" style="display: none;">
+                <div class="card">
+                    <button id="back-to-list" class="back-button">← Back to Journal</button>
+                    <div id="journal-content"></div>
                 </div>
             </section>
         </main>
