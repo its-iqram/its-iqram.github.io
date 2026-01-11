@@ -4,11 +4,114 @@ const config = {
     journalPath: 'journal'
 };
 
-// Load all journal entries
+// Page content mapping
+const pageContent = {
+    'index': () => {
+        window.location.href = 'index.html';
+    },
+    'study': () => {
+        window.location.href = 'study.html';
+    },
+    'showcase': () => {
+        window.location.href = 'showcase.html';
+    },
+    'journal': () => {
+        window.location.href = 'journal.html';
+    },
+    'about': () => {
+        window.location.href = 'about.html';
+    },
+    'connect': () => {
+        window.location.href = 'connect.html';
+    }
+};
+
+// Get current page from URL
+function getCurrentPage() {
+    const path = window.location.pathname.split('/').pop().replace('.html', '') || 'index';
+    const pageMap = {
+        '': 'index',
+        'index': 'index',
+        'study': 'study',
+        'showcase': 'showcase',
+        'journal': 'journal',
+        'about': 'about',
+        'connect': 'connect'
+    };
+    return pageMap[path] || 'index';
+}
+
+// Navigate to page with clean URL
+function navigateTo(page) {
+    // Update URL without .html
+    history.pushState({page}, '', '/' + (page === 'index' ? '' : page));
+    
+    // Update active navigation
+    updateActiveNav();
+    
+    // Redirect to actual HTML file
+    if (pageContent[page]) {
+        pageContent[page]();
+    }
+}
+
+// Update active navigation state
+function updateActiveNav() {
+    // Remove active class from all links
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
+    
+    // Add active class to current page
+    const currentPage = getCurrentPage();
+    const activeLink = document.querySelector(`[data-page="${currentPage}"]`);
+    if (activeLink) {
+        activeLink.classList.add('active');
+    }
+}
+
+// Handle back/forward buttons
+window.addEventListener('popstate', function(event) {
+    const page = getCurrentPage();
+    updateActiveNav();
+});
+
+// Initialize navigation on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Update navigation based on current URL
+    updateActiveNav();
+    
+    // Make navigation links use clean URLs
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const page = this.getAttribute('data-page');
+            navigateTo(page);
+        });
+    });
+    
+    // Initialize journal page if on journal page
+    if (getCurrentPage() === 'journal') {
+        loadJournalList();
+    }
+    
+    // Render math in static content
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false},
+            {left: "\\(", right: "\\)", display: false},
+            {left: "\\[", right: "\\]", display: true}
+        ]
+    });
+    
+    // Highlight code blocks
+    hljs.highlightAll();
+});
+
+// JOURNAL-SPECIFIC FUNCTIONS (only on journal page)
 async function loadJournalList() {
     try {
-        // This will be replaced with actual file listing
-        // For now, we'll use a static list and load each file
         const journalFiles = [
             '2026-01-11-journal.md',
             '2026-01-10-journal.md',
@@ -160,26 +263,6 @@ async function loadJournalEntry(filename) {
         document.getElementById('journal-content').innerHTML = '<div class="error">Error loading journal entry</div>';
     }
 }
-
-// Initialize journal page
-document.addEventListener('DOMContentLoaded', function() {
-    if (window.location.pathname.includes('journal.html')) {
-        loadJournalList();
-    }
-    
-    // Render math in static content
-    renderMathInElement(document.body, {
-        delimiters: [
-            {left: "$$", right: "$$", display: true},
-            {left: "$", right: "$", display: false},
-            {left: "\\(", right: "\\)", display: false},
-            {left: "\\[", right: "\\]", display: true}
-        ]
-    });
-    
-    // Highlight code blocks
-    hljs.highlightAll();
-});
 
 // Utility function for other pages
 async function loadSpecificFile(folder, filename) {
