@@ -1,1 +1,30 @@
-
+/* Classic "old blue" palette */:root {  --old-blue: #3a5f7d;   /* Deep, trustworthy blue (not pastel) */  --light-blue: #e6f0fa; /* Soft background accent */  --dark-text: #2d3748;  /* Near-black for readability */  --light-gray: #f8fafc; /* Warm off-white background */  --card-shadow: 0 4px 12px rgba(0,0,0,0.08);}
+* {  margin: 0;  padding: 0;  box-sizing: border-box;}
+body {  font-family: 'Open Sans', sans-serif;  color: var(--dark-text);  background-color: var(--light-gray);  line-height: 1.6;  padding: 0;  margin: 0;}
+/* Serif headings with character */h1, h2, h3 {  font-family: 'Merriweather', serif;  font-weight: 700;  color: var(--old-blue);  margin-bottom: 1rem;}
+/* Navigation bar */nav {  background-color: white;  box-shadow: 0 2px 10px rgba(0,0,0,0.1);  position: sticky;  top: 0;  z-index: 100;}
+nav ul {  display: flex;  list-style: none;  justify-content: center;  padding: 1rem 0;}
+nav li {  margin: 0 1.5rem;}
+nav a {  text-decoration: none;  font-weight: 600;  color: var(--old-blue);  font-size: 1.1rem;  padding: 0.5rem 0;  position: relative;  transition: color 0.3s;}
+nav a:hover {  color: #1a3a5f;}
+nav a::after {  content: '';  position: absolute;  bottom: 0;  left: 0;  width: 0;  height: 2px;  background-color: var(--old-blue);  transition: width 0.3s;}
+nav a:hover::after {  width: 100%;}
+/* Main content area */main {  max-width: 800px;  margin: 3rem auto;  padding: 0 1.5rem;  text-align: center;}
+.intro {  background-color: white;  border-radius: 10px;  padding: 2rem;  margin-top: 2rem;  box-shadow: var(--card-shadow);  text-align: left;}
+/* About page grid */.about-grid {  display: grid;  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));  gap: 1.5rem;  margin: 1.5rem 0;}
+.about-card h2 {  color: var(--old-blue);  margin: 0.75rem 0;}
+.signature {  margin-top: 1.5rem;  font-style: italic;  padding-top: 1rem;  border-top: 1px dashed #cbd5e0;}
+/* Blog/Study post listings */.post-list {  list-style: none;  margin-top: 1.5rem;}
+.post-list li {  padding: 1.2rem 0;  border-bottom: 1px solid #e2e8f0;}
+.post-list li:last-child {  border-bottom: none;}
+.post-list h2 {  margin-bottom: 0.5rem;  font-size: 1.4rem;}
+.post-list a {  color: var(--old-blue);  text-decoration: none;  transition: color 0.2s;}
+.post-list a:hover {  color: #1a3a5f;  text-decoration: underline;}
+.post-date {  color: #4a5568;  font-size: 0.9rem;  margin-bottom: 0.5rem;  font-weight: 600;}
+.coming-soon {  opacity: 0.8;  background: var(--light-blue);  border-radius: 8px;  padding: 1rem;}
+.highlight {  color: var(--old-blue);  font-weight: 700;}
+.more-posts {  margin-top: 1.5rem;  padding-top: 1rem;  border-top: 1px solid #e2e8f0;  font-weight: 600;}
+.more-posts a {  color: var(--old-blue);  text-decoration: none;}
+.more-posts a:hover {  text-decoration: underline;}
+/* Footer */footer {  background-color: var(--old-blue);  color: white;  text-align: center;  padding: 1.5rem;  margin-top: 3rem;  font-weight: 600;}
+/* Responsive adjustments */@media (max-width: 600px) {  nav ul {    flex-direction: column;    gap: 0.5rem;  }    nav li {    margin: 0;  }    .about-grid {    grid-template-columns: 1fr;  }    main {    margin: 1.5rem;  }    .intro {    padding: 1.5rem;  }}
